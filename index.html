@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cardápio Premium | DANO'S BURGUER</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. VARIÁVEIS E RESET GERAL
+           ========================================================================== */
+        :root {
+            --gold: #D4AF37;
+            --gold-hover: #f3cf65;
+            --price-green: #2ecc71;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --text-light: #ffffff;
+            --text-muted: #b3b3b3;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Remove brilho azul ao clicar no mobile */
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden; /* Trava rolagem horizontal */
+            scroll-behavior: smooth;
+        }
+
+        /* Classes de visibilidade e transição */
+        .escondido {
+            display: none !important;
+        }
+        
+        .oculto-transicao {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. TELA DE BOAS-VINDAS
+           ========================================================================== */
+        #welcome-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #111, var(--dark-bg));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 1000;
+            transition: var(--transition);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Container interno para limitar a largura e dar espaçamento */
+        .welcome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 20px;
+        }
+
+        .logo-area {
+            width: 100%;
+            max-width: 250px;
+            height: 160px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-area img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .welcome-text h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-text p {
+            color: var(--text-muted);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+        }
+
+        #welcome-categories {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .category-navigation-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            width: 300px;
+            height: 200px;
+            position: relative;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .category-navigation-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .category-navigation-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6) saturate(0.8);
+            transition: var(--transition);
+        }
+
+        .category-navigation-card:hover img {
+            filter: brightness(0.8) saturate(1);
+            transform: scale(1.05);
+        }
+
+        .category-navigation-card h3 {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            font-family: 'Playfair Display', serif;
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 2;
+        }
+
+        /* ==========================================================================
+           3. ÁREA PRINCIPAL DO CARDÁPIO
+           ========================================================================== */
+        #cardapio-main-area {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        #cardapio-main-area.visivel {
+            opacity: 1;
+        }
+
+        header {
+            padding: 50px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #121212, var(--dark-bg));
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+        }
+
+        .btn-voltar {
+            background: rgba(255,255,255,0.05);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-voltar:hover {
+            background: var(--gold);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .menu {
+            flex: 1; /* Faz o menu crescer empurrando o rodapé para baixo */
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .categoria-titulo {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 2.2rem;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .pizza-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 240px;
+            align-items: center;
+            gap: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+        }
+
+        .pizza-row:hover {
+            transform: translateY(-3px); /* Reduzido levemente para estabilidade */
+            border-color: var(--gold);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        .pizza-img-box {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: #000;
+            width: 100%;
+            height: 110px;
+        }
+
+        .pizza-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .pizza-row:hover .pizza-img-box img {
+            transform: scale(1.05);
+        }
+
+        .pizza-title {
+            padding-left: 10px;
+        }
+
+        .pizza-title h2 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--gold);
+            letter-spacing: 0.5px;
+        }
+
+        .pizza-title p {
+            margin: 8px 0 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .pizza-price {
+            margin-top: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--price-green);
+        }
+
+        .btn-pedir {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .btn-pedir svg {
+            width: 35px;
+            height: 35px;
+            fill: var(--gold);
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-pedir:hover {
+            background: var(--gold);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212,175,55,0.2);
+        }
+
+        .btn-pedir:hover svg {
+            fill: #000;
+        }
+
+        /* ==========================================================================
+           4. MODAL
+           ========================================================================== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            background: #111;
+            border-radius: 20px;
+            border: 1px solid var(--gold);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            position: relative;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-box::-webkit-scrollbar { width: 6px; }
+        .modal-box::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
+        .modal-box::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover {
+            background: #ea1d2c;
+            transform: rotate(90deg);
+        }
+
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .modal-left { position: relative; }
+        .modal-left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            min-height: 100%;
+        }
+
+        .modal-right {
+            padding: 35px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-right h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            margin: 0 0 10px;
+            font-size: 2rem;
+            line-height: 1.2;
+        }
+
+        .modal-right p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: #080808;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+        }
+
+        input:focus, textarea:focus { border-color: var(--gold); }
+        textarea { min-height: 90px; resize: vertical; }
+
+        .upsell-box {
+            margin-top: 5px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+        }
+
+        .upsell-box strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+        }
+
+        .upsell-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            text-transform: none;
+        }
+
+        .upsell-option input[type="number"] {
+            width: 65px;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .total {
+            margin: 15px 0 25px;
+            color: var(--price-green);
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .btn-final {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #25D366, #1da851);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
+            margin-top: auto;
+        }
+
+        .btn-final:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* ==========================================================================
+           5. RODAPÉ (FOOTER) - ESTRUTURA FIXA SEM MARGENS NEGATIVAS
+           ========================================================================== */
+        .site-footer {
+            background: #050505;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            padding: 60px 20px 20px;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto; /* Empurra o rodapé pro fundo da tela */
+        }
+
+        .footer-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-logo {
+            max-width: 160px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5));
+        }
+
+        .footer-section p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .footer-section h3 {
+            color: var(--gold);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: #000;
+            background: var(--gold);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .delivery-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .delivery-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .delivery-link.ifood:hover {
+            color: #fff;
+            background: #ea1d2c;
+            border-color: #ea1d2c;
+            transform: translateY(-2px);
+        }
+
+        .delivery-link.aiqfome:hover {
+            color: #fff;
+            background: #7a22ff;
+            border-color: #7a22ff;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-bottom p {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+
+
+        /* ==========================================================================
+           BOTÕES DE DELIVERY — TOPO E CARDS DO CARDÁPIO
+           Mantém o estilo original e apenas organiza iFood / aiqfome.
+           ========================================================================== */
+        .delivery-top-area {
+            width: 100%;
+            max-width: 720px;
+            margin: -22px auto 34px;
+            padding: 18px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+        }
+
+        .delivery-top-area span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .delivery-top-buttons,
+        .delivery-card-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delivery-channel-btn {
+            min-height: 44px;
+            padding: 11px 16px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.18);
+            transition: var(--transition);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+            white-space: nowrap;
+        }
+
+        .delivery-channel-btn.ifood,
+        .delivery-link.ifood {
+            background: linear-gradient(135deg, #ea1d2c, #b91420);
+            color: #fff;
+            border-color: rgba(234,29,44,0.55);
+        }
+
+        .delivery-channel-btn.aiqfome,
+        .delivery-link.aiqfome {
+            background: linear-gradient(135deg, #7a22ff, #4e10b8);
+            color: #fff;
+            border-color: rgba(122,34,255,0.55);
+        }
+
+        .delivery-channel-btn:hover,
+        .delivery-link.ifood:hover,
+        .delivery-link.aiqfome:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+            box-shadow: 0 16px 30px rgba(0,0,0,0.38);
+        }
+
+        .pizza-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .pizza-actions .btn-pedir {
+            flex: 1;
+            min-height: 116px;
+        }
+
+        .delivery-card-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .delivery-card-buttons .delivery-channel-btn {
+            width: 100%;
+            min-height: 40px;
+            padding: 10px 8px;
+            font-size: 0.72rem;
+            border-radius: 10px;
+        }
+
+
+        .btn-voltar-site {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    padding: 14px 24px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(255,255,255,0.04));
+    color: var(--gold);
+    border: 1px solid rgba(212,175,55,0.55);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.35);
+    transition: var(--transition);
+}
+
+.btn-voltar-site:hover {
+    background: var(--gold);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(212,175,55,0.25);
+}
+        
+
+        /* ==========================================================================
+           6. RESPONSIVIDADE (Telas Menores)
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .pizza-row { grid-template-columns: 120px 1fr 190px; gap: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            /* Ajustes gerais de espaçamento */
+            .welcome-container { padding: 30px 15px; }
+            header { padding: 30px 15px; }
+            .menu { padding: 10px 15px 40px; }
+
+            .logo-area { max-width: 180px; height: 120px; margin-bottom: 20px; }
+            
+            .category-navigation-card { width: 100%; height: 160px; max-width: 400px; }
+            .category-navigation-card h3 { font-size: 1.5rem; }
+
+            /* Grid do cardápio fica empilhado e centralizado */
+            .pizza-row { 
+                grid-template-columns: 1fr; 
+                text-align: center; 
+                padding: 25px 20px; 
+            }
+            .pizza-img-box { 
+                max-width: 100%; 
+                height: 200px; 
+                margin: 0 auto 10px; 
+            }
+            .pizza-title { padding-left: 0; margin-bottom: 15px; }
+
+            .btn-pedir { 
+                flex-direction: row; 
+                gap: 10px; 
+                padding: 16px; 
+                font-size: 0.9rem; 
+            }
+            .btn-pedir svg { margin-bottom: 0; width: 25px; height: 25px; }
+
+            .delivery-top-area {
+                margin: -18px auto 28px;
+                padding: 16px;
+            }
+
+            .delivery-top-buttons,
+            .delivery-card-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .delivery-channel-btn,
+            .delivery-card-buttons .delivery-channel-btn {
+                width: 100%;
+                min-height: 44px;
+                font-size: 0.82rem;
+            }
+
+            .pizza-actions {
+                height: auto;
+            }
+
+            .pizza-actions .btn-pedir {
+                min-height: auto;
+            }
+
+            /* Ajustes finos do modal para não quebrar em telas pequenas */
+            .modal { padding: 10px; }
+            .modal-content { grid-template-columns: 1fr; }
+            .modal-left img { height: 200px; min-height: auto; border-radius: 20px 20px 0 0; }
+            .modal-right { padding: 25px 20px; }
+            .modal-box { max-height: 95vh; }
+
+            /* Responsividade do Rodapé - Alinhamento Central */
+            .footer-content { text-align: center; gap: 35px; }
+            .footer-section { align-items: center; }
+            .footer-section h3::after { left: 50%; transform: translateX(-50%); }
+            .social-links { justify-content: center; }
+            .delivery-links { justify-content: center; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="welcome-screen">
+    <div class="welcome-container">
+        <div class="logo-area">
+            <img src="logo.png" alt="Sr. Ofrélio Pizza House">
+        </div>
+        
+        <div class="welcome-text">
+            <h1>Seja Bem Vindo</h1>
+            <p>Escolha a experiência que deseja hoje e conheça nossos sabores que iluminam.</p>
+        </div>
+
+        <div class="delivery-top-area" aria-label="Canais de pedido">
+            <span>Outras Opções</span>
+            <div class="delivery-top-buttons">
+                <a class="delivery-channel-btn ifood" href="https://www.ifood.com.br/" target="_blank" rel="noopener" data-canal="ifood">🍽️ iFood</a>
+                <a class="delivery-channel-btn aiqfome" href="https://www.aiqfome.com/" target="_blank" rel="noopener" data-canal="aiqfome">⚡ aiqfome</a>
+            </div>
+        </div>
+        <a href="https://movanegocios.github.io/DANO-S-BURGER/" target="_blank" rel="noopener" class="btn-voltar-site">← Voltar para site</a>
+        <div id="welcome-categories"></div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="logo.png" alt="Sr. Ofrélio Logo" class="footer-logo">
+                <p>Sabor que ilumina, energia que conecta e momentos que marcam a sua noite.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Atendimento</h3>
+                <p>📍 Dr. Prudente de Morais, 537 – Canasvieiras</p>
+                <p>📱 WhatsApp: (48) 99605-3746</p>
+                <p>🕒 Seg a Sáb, das 18h às 23h</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Acompanhe</h3>
+                <div class="social-links">
+                <a href="https://www.instagram.com/danos.burger/" target="_blank">Instagram</a>
+            </div>
+                <h3>Outras Opções</h3>
+            <div class="delivery-links">
+                <a class="delivery-link ifood" href="https://www.ifood.com.br/" target="_blank" rel="noopener" data-canal="ifood">iFood</a>
+                <a class="delivery-link aiqfome" href="https://www.aiqfome.com/" target="_blank" rel="noopener" data-canal="aiqfome">aiqfome</a>
+            </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Dano’s Burger. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</div>
+
+<div id="cardapio-main-area" class="escondido">
+    <header>
+        <h1>Cardápio Premium</h1>
+        <p>Sabor que ilumina, energia que conecta e momentos que marcam.</p>
+    </header>
+
+    <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px 20px 0;">
+        <button class="btn-voltar" onclick="voltarParaInicio()">
+            ← Voltar para Categorias
+        </button>
+    </div>
+
+    <main class="menu" id="menu"></main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="logo.png" alt="Sr. Ofrélio Logo" class="footer-logo">
+                <p>Sabor que ilumina, energia que conecta e momentos que marcam a sua noite.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Atendimento</h3>
+                <p>📍 Dr. Prudente de Morais, 537 – Canasvieiras</p>
+                <p>📱 WhatsApp: (48) 99605-3746</p>
+                <p>🕒 Seg a Sáb, das 18h às 23h</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Acompanhe</h3>
+                 <div class="social-links">
+                <a href="https://www.instagram.com/danos.burger/" target="_blank">Instagram</a>
+            </div>
+            <div class="delivery-links">
+                <a class="delivery-link ifood" href="https://www.ifood.com.br/" target="_blank" rel="noopener" data-canal="ifood">iFood</a>
+                <a class="delivery-link aiqfome" href="https://www.aiqfome.com/" target="_blank" rel="noopener" data-canal="aiqfome">aiqfome</a>
+            </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Dano's Burger. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <button class="close" onclick="fecharModal()">×</button>
+        <div class="modal-content">
+            <div class="modal-left">
+                <img id="modalImagem" src="" alt="Pizza escolhida">
+            </div>
+            <div class="modal-right">
+                <h2 id="modalTitulo"></h2>
+                <p id="modalDescricao"></p>
+                <div class="total" id="modalPreco"></div>
+
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="quantidade" min="1" value="1" oninput="atualizarTotal()">
+                </div>
+                <div class="form-group">
+                    <label>Endereço de entrega *</label>
+                    <input type="text" id="endereco" placeholder="Rua, número, bairro e referência">
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="observacoes" placeholder="Ex: sem cebola, pouca cebola, sem orégano..."></textarea>
+                </div>
+                <div class="upsell-box">
+                    <strong>Deseja adicionar algo?</strong>
+                    <div id="upsellsArea"></div>
+                </div>
+                <div class="total" id="totalPedido"></div>
+                <button class="btn-final" onclick="finalizarPedido()">
+                    Enviar pedido pelo WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* --------------------------------------------------------------------------
+       1. CONFIGURAÇÕES E DADOS GERAIS
+       -------------------------------------------------------------------------- */
+    const CONFIG = {
+        whatsapp: "5500000000000",
+        n8nWebhook: "https://SEU-N8N.com/webhook/pedido-pizza",
+        googleAppsScript: "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec",
+        ifoodUrl: "https://www.ifood.com.br/",
+        aiqfomeUrl: "https://www.aiqfome.com/"
+    };
+
+    const upsellsGlobais = [
+        { id: "coca2l", nome: "Coca-Cola 2L", preco: 14 },
+        { id: "borda", nome: "Borda recheada", preco: 12 },
+        { id: "sobremesa", nome: "Pizza doce pequena", preco: 25 },
+        { id: "guarana", nome: "Guaraná 2L", preco: 12 }
+    ];
+
+    const pizzas = [
+        {
+            id: "bufala",
+            categoria: "Hamburgueres", 
+            nome: "Muçarela de Búfala com Tomate",
+            descricao: "Muçarela de búfala, tomate fresco, molho artesanal e manjericão.",
+            preco: 65,
+            imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDzo3VXzmDGRDNo92_ihh3Eyx3jvyxqumHXg&s",
+            upsells: ["coca2l", "borda", "sobremesa"]
+        },
+        {
+            id: "calabresa",
+            categoria: "Hamburgueres",
+            nome: "Calabresa Especial",
+            descricao: "Calabresa fatiada, cebola, mussarela, molho da casa e orégano.",
+            preco: 55,
+            imagem: "https://www.skymsen.com/uploads/blog/como-fazer-hamburguer-recheado-passo-a-passo-para-surpreender-os-clientes.jpg",
+            upsells: ["coca2l", "guarana", "borda"]
+        },
+        {
+            id: "sensacao",
+            categoria: "Batatas Fritas", 
+            nome: "Sensação Especial",
+            descricao: "Chocolate ao leite coberto com fatias de morango fresco e um toque de leite condensado.",
+            preco: 50,
+            imagem: "https://turistandosp.com.br/wp-content/uploads/2025/07/455320231_3298077653659638_9056436667415908379_n-1-585x468.jpg",
+            upsells: ["coca2l", "guarana"]
+        },
+        {
+            id: "veganissima",
+            categoria: "Vegetarianos", 
+            nome: "Veganíssima Ofrélio",
+            descricao: "Mix de cogumelos, pimentões assados, brócolis, cebola roxa e queijo vegano artesanal.",
+            preco: 70,
+            imagem: "https://assets.unileversolutions.com/recipes-v2/111189.jpg",
+            upsells: ["guarana"]
+        }
+    ];
+
+    let pizzaSelecionada = null;
+
+    /* --------------------------------------------------------------------------
+       2. NAVEGAÇÃO E RENDERIZAÇÃO
+       -------------------------------------------------------------------------- */
+    function gerarNavegacaoBemVindo() {
+        const areaCategorias = document.getElementById("welcome-categories");
+        areaCategorias.innerHTML = "";
+
+        const categoriasUnicas = [...new Set(pizzas.map(p => p.categoria || "Outras Ofrélio"))];
+
+        categoriasUnicas.forEach(cat => {
+            const primeiraPizza = pizzas.find(p => (p.categoria || "Outras Ofrélio") === cat);
+            const imagemCat = primeiraPizza ? primeiraPizza.imagem : "";
+
+            areaCategorias.innerHTML += `
+                <div class="category-navigation-card" onclick="abrirCategoria('${cat}')">
+                    <img src="${imagemCat}" alt="${cat}">
+                    <h3>${cat}</h3>
+                </div>
+            `;
+        });
+    }
+
+    function abrirCategoria(catSelecionada) {
+        renderizarMenu(catSelecionada);
+
+        const welcome = document.getElementById("welcome-screen");
+        const cardapioArea = document.getElementById("cardapio-main-area");
+
+        welcome.classList.add("oculto-transicao");
+        cardapioArea.classList.remove("escondido");
+
+        setTimeout(() => {
+            cardapioArea.classList.add("visivel");
+            document.body.style.overflowY = "auto";
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }, 50);
+
+        setTimeout(() => {
+            welcome.classList.add("escondido");
+        }, 400); // Sincronizado com o CSS transition
+    }
+
+    function voltarParaInicio() {
+        const welcome = document.getElementById("welcome-screen");
+        const cardapioArea = document.getElementById("cardapio-main-area");
+
+        cardapioArea.classList.remove("visivel");
+        welcome.classList.remove("escondido");
+
+        setTimeout(() => {
+            welcome.classList.remove("oculto-transicao");
+            document.body.style.overflowY = "auto"; 
+        }, 50);
+
+        setTimeout(() => {
+            cardapioArea.classList.add("escondido");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 400);
+    }
+
+    function renderizarMenu(categoriaFiltro) {
+        const menu = document.getElementById("menu");
+        menu.innerHTML = "";
+
+        const iconeBotaoSVG = `
+            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M414.4 129.6C388.5 73.1 333.1 32 256 32S123.5 73.1 97.6 129.6c-7.9 17.3-13.8 36.3-17 56.4c-2.4 15 9.4 28 24.6 28h301.7c15.2 0 26.9-13 24.6-28c-3.3-20.1-9.2-39.1-17.1-56.4zM32 256c-17.7 0-32 14.3-32 32s14.3 32 32 32h448c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zm32 96c-17.7 0-32 14.3-32 32c0 53 43 96 96 96h256c53 0 96-43 96-96c0-17.7-14.3-32-32-32H64z"/>
+            </svg>
+        `;
+
+        const categorias = [categoriaFiltro];
+
+        categorias.forEach(cat => {
+            menu.innerHTML += `<h2 class="categoria-titulo">${cat}</h2>`;
+
+            const pizzasDaCategoria = pizzas.filter(p => (p.categoria || "Outras Ofrélio") === cat);
+            
+            pizzasDaCategoria.forEach(pizza => {
+                menu.innerHTML += `
+                    <div class="pizza-row">
+                        <div class="pizza-img-box">
+                            <img src="${pizza.imagem}" alt="${pizza.nome}">
+                        </div>
+
+                        <div class="pizza-title">
+                            <h2>${pizza.nome}</h2>
+                            <p>${pizza.descricao}</p>
+                            <div class="pizza-price">R$ ${pizza.preco.toFixed(2).replace(".", ",")}</div>
+                        </div>
+
+                       <div class="pizza-actions">
+                            <button class="btn-pedir" onclick="abrirModal('${pizza.id}')">
+                                ${iconeBotaoSVG}
+                                Preparar<br>meu lanche
+                            </button>
+
+                            <div class="delivery-card-buttons" aria-label="Pedir em aplicativos externos">
+                                <a class="delivery-channel-btn ifood" href="${CONFIG.ifoodUrl}" target="_blank" rel="noopener" data-canal="ifood" onclick="abrirCanalPedido('ifood', event)">iFood</a>
+                                <a class="delivery-channel-btn aiqfome" href="${CONFIG.aiqfomeUrl}" target="_blank" rel="noopener" data-canal="aiqfome" onclick="abrirCanalPedido('aiqfome', event)">aiqfome</a>
+                            </div>
+                       </div>
+                    </div>
+                `;
+            });
+        });
+    }
+
+
+
+    function abrirCanalPedido(canal, event) {
+        if (event) event.stopPropagation();
+
+        const url = canal === "ifood" ? CONFIG.ifoodUrl : CONFIG.aiqfomeUrl;
+        if (!url || url === "#") return;
+
+        try {
+            if (typeof enviarParaN8N === "function") {
+                enviarParaN8N({
+                    data: new Date().toISOString(),
+                    tipo: "clique_canal_externo",
+                    canal,
+                    produto: pizzaSelecionada ? pizzaSelecionada.nome : "",
+                    origem: "cardapio-premium"
+                });
+            }
+        } catch (error) {
+            console.warn("Não foi possível registrar clique externo:", error);
+        }
+    }
+
+    /* --------------------------------------------------------------------------
+       3. LÓGICA DO MODAL E CARRINHO
+       -------------------------------------------------------------------------- */
+    function abrirModal(id) {
+        pizzaSelecionada = pizzas.find(p => p.id === id);
+
+        document.getElementById("modalImagem").src = pizzaSelecionada.imagem;
+        document.getElementById("modalTitulo").innerText = pizzaSelecionada.nome;
+        document.getElementById("modalDescricao").innerText = pizzaSelecionada.descricao;
+        document.getElementById("modalPreco").innerText =
+            `R$ ${pizzaSelecionada.preco.toFixed(2).replace(".", ",")}`;
+
+        document.getElementById("quantidade").value = 1;
+        document.getElementById("endereco").value = "";
+        document.getElementById("observacoes").value = "";
+
+        const upsellsArea = document.getElementById("upsellsArea");
+        upsellsArea.innerHTML = "";
+
+        const upsellsDaPizza = upsellsGlobais.filter(item =>
+            pizzaSelecionada.upsells.includes(item.id)
+        );
+
+        upsellsDaPizza.forEach(item => {
+            upsellsArea.innerHTML += `
+                <label class="upsell-option">
+                    <input type="number" id="upsell-${item.id}" min="0" value="0" oninput="atualizarTotal()">
+                    ${item.nome} — R$ ${item.preco.toFixed(2).replace(".", ",")}
+                </label>
+            `;
+        });
+
+        atualizarTotal();
+        document.getElementById("modal").classList.add("active");
+        document.body.style.overflow = "hidden"; // Impede rolagem da tela por trás do modal
+    }
+
+    function fecharModal() {
+        document.getElementById("modal").classList.remove("active");
+        if(document.getElementById("welcome-screen").classList.contains("escondido")) {
+            document.body.style.overflowY = "auto";
+        }
+    }
+
+    function pegarUpsellsSelecionados() {
+        const upsellsSelecionados = [];
+        const upsellsDaPizza = upsellsGlobais.filter(item => pizzaSelecionada.upsells.includes(item.id));
+
+        upsellsDaPizza.forEach(item => {
+            const inputQtd = document.getElementById(`upsell-${item.id}`);
+            if (inputQtd) {
+                const qtd = Number(inputQtd.value) || 0;
+                if (qtd > 0) {
+                    upsellsSelecionados.push({ ...item, quantidade: qtd });
+                }
+            }
+        });
+
+        return upsellsSelecionados;
+    }
+
+    function calcularTotal() {
+        const quantidade = Number(document.getElementById("quantidade").value) || 1;
+        const totalPizza = pizzaSelecionada.preco * quantidade;
+        const upsells = pegarUpsellsSelecionados();
+        const totalUpsells = upsells.reduce((soma, item) => soma + (item.preco * item.quantidade), 0);
+
+        return totalPizza + totalUpsells;
+    }
+
+    function atualizarTotal() {
+        if (!pizzaSelecionada) return;
+        const total = calcularTotal();
+        document.getElementById("totalPedido").innerText =
+            `Total estimado: R$ ${total.toFixed(2).replace(".", ",")}`;
+    }
+
+    /* --------------------------------------------------------------------------
+       4. ENVIO DE DADOS (CHECKOUT)
+       -------------------------------------------------------------------------- */
+    async function finalizarPedido() {
+        const quantidade = Number(document.getElementById("quantidade").value);
+        const endereco = document.getElementById("endereco").value.trim();
+        const observacoes = document.getElementById("observacoes").value.trim();
+
+        if (!quantidade || quantidade < 1) {
+            alert("Informe uma quantidade válida.");
+            return;
+        }
+
+        if (!endereco) {
+            alert("Informe o endereço de entrega.");
+            return;
+        }
+
+        const upsellsSelecionados = pegarUpsellsSelecionados();
+        const total = calcularTotal();
+
+        const pedido = {
+            data: new Date().toISOString(),
+            pizza: pizzaSelecionada.nome,
+            quantidade,
+            precoPizza: pizzaSelecionada.preco,
+            upsells: upsellsSelecionados.map(item => `${item.quantidade}x ${item.nome}`),
+            endereco,
+            observacoes,
+            total,
+            origem: "cardapio-premium"
+        };
+
+        // Dispara integrações em background sem travar a tela do usuário
+        enviarParaN8N(pedido);
+        enviarParaAppsScript(pedido);
+
+        const mensagem = `
+Olá! Quero fazer este pedido:
+
+🍔 Pedido: ${pedido.pizza}
+🔢 Quantidade: ${pedido.quantidade}
+
+${pedido.upsells.length > 0 ? `➕ Adicionais: ${pedido.upsells.join(", ")}` : "➕ Sem adicionais"}
+
+📍 Endereço:
+${pedido.endereco}
+
+📝 Observações:
+${pedido.observacoes || "Nenhuma"}
+
+💰 Total estimado: R$ ${pedido.total.toFixed(2).replace(".", ",")}
+
+Meu nome:
+Forma de pagamento:
+        `;
+
+        const link = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, "_blank");
+        fecharModal(); // Fecha o modal após enviar
+    }
+
+    async function enviarParaN8N(pedido) {
+        try {
+            await fetch(CONFIG.n8nWebhook, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pedido)
+            });
+        } catch (error) {
+            console.error("Erro N8N:", error);
+        }
+    }
+
+    async function enviarParaAppsScript(pedido) {
+        try {
+            await fetch(CONFIG.googleAppsScript, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pedido)
+            });
+        } catch (error) {
+            console.error("Erro AppsScript:", error);
+        }
+    }
+
+
+    function configurarLinksDelivery() {
+        document.querySelectorAll('[data-canal="ifood"]').forEach(link => {
+            if (CONFIG.ifoodUrl) link.href = CONFIG.ifoodUrl;
+        });
+
+        document.querySelectorAll('[data-canal="aiqfome"]').forEach(link => {
+            if (CONFIG.aiqfomeUrl) link.href = CONFIG.aiqfomeUrl;
+        });
+    }
+
+    /* --------------------------------------------------------------------------
+       5. INICIALIZAÇÃO
+       -------------------------------------------------------------------------- */
+    configurarLinksDelivery();
+    gerarNavegacaoBemVindo();
+</script>
+
+</body>
+</html>
